@@ -78,10 +78,13 @@ Depends:
  nvidia-361 | nvidia-361-updates | nvidia-experimental-361 |
  nvidia-364 | nvidia-364-updates | nvidia-experimental-364 |
  nvidia-367 | nvidia-367-updates | nvidia-experimental-367 |
+ nvidia-370 | nvidia-370-updates | nvidia-experimental-370 |
  nvidia-375 | nvidia-375-updates | nvidia-experimental-375 |
  nvidia-378 | nvidia-378-updates | nvidia-experimental-378 |
  nvidia-381 | nvidia-381-updates | nvidia-experimental-381 |
- nvidia-384 | nvidia-384-updates | nvidia-experimental-384
+ nvidia-384 | nvidia-384-updates | nvidia-experimental-384 |
+ nvidia-390 | nvidia-390-updates | nvidia-experimental-390 |
+ nvidia-396 | nvidia-396-updates | nvidia-experimental-396
 Description: NVIDIA Optimus support using the proprietary NVIDIA driver
  This metapackage ensures that the proprietary NVIDIA driver is installed in a
  way such that 3D acceleration does not break. It does so by configuring the
