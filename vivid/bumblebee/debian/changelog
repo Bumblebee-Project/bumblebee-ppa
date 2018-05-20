@@ -1,3 +1,9 @@
+bumblebee (3.2.1-101~vividppa1) vivid; urgency=low
+
+  * Add support for 370, 390 and 396 series.
+
+ -- Luca Boccassi <luca.boccassi@gmail.com>  Sun, 20 May 2018 15:27:09 +0100
+
 bumblebee (3.2.1-100~vividppa1) vivid; urgency=low
 
   * Fix typo in blacklist, really support 378
