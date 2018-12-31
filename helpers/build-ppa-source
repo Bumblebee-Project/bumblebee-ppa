@@ -10,10 +10,6 @@ cd "$(dirname "$(dirname "$(readlink -f "$0")")")"
 distsdir="$PWD"
 
 pkg="$1"
-tarball="$2"
-ballname="${2##*/}"
-version="${ballname%%.orig.tar.gz}"
-version="${version##*_}"
 while :; do
     for dist in "${DISTS[@]}"; do
         [ -d "$dist/$pkg/debian" ] && break 2
@@ -24,14 +20,36 @@ while :; do
     exit 2
 done
 
-if [[ $ballname != ${pkg}_*.orig.tar.gz ]]; then
-    echo "Invalid tarball: $tarball, expecting something like:"
-    echo "Usage: $0 $pkg path/to/${pkg}_version.orig.tar.gz"
-    exit 2
-fi
-if [ ! -f "$tarball" ]; then
-    echo "Tarball $tarball does not exist."
-    exit 2
+if [ "$#" -eq 1 ] && [ "$pkg" = "bumblebee" ]; then
+    pushd "${DISTS[0]}/$pkg" &>/dev/null
+    version=$(dpkg-parsechangelog --show-field Version | sed -e 's/-[^-]*$//')
+    popd &>/dev/null
+    ballname="${pkg}_${version}.orig.tar.gz"
+    tarball="../$ballname"
+    if [ ! -f "$tarball" ]; then
+        if [[ "$version" =~ git ]] && git show-ref --verify --quiet refs/remotes/dev/develop; then
+            echo "Tarball $tarball does not exist, creating from dev/develop branch."
+            git fetch dev
+            git archive --format tar.gz --prefix "$pkg"-"$version"/ dev/develop > "$tarball"
+        else
+            echo "Tarball $tarball does not exist. Set the version to x.y.z+gitYYYYMMDD-foo and add the upstream repository as a 'dev' remote to create from git develop branch."
+            exit 2
+        fi
+    fi
+else
+    tarball="$2"
+    ballname="${2##*/}"
+    version="${ballname%%.orig.tar.gz}"
+    version="${version##*_}"
+    if [[ $ballname != ${pkg}_*.orig.tar.gz ]]; then
+        echo "Invalid tarball: $tarball, expecting something like:"
+        echo "Usage: $0 $pkg path/to/${pkg}_version.orig.tar.gz"
+        exit 2
+    fi
+    if [ ! -f "$tarball" ]; then
+        echo "Tarball $tarball does not exist."
+        exit 2
+    fi
 fi
 
 tobuild=()
