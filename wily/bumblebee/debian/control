@@ -55,9 +55,11 @@ Depends:
  ${nvidia:Depends},
 # proprietary NVIDIA packages in Debian
  nvidia-driver |
+ nvidia-legacy-390xx-driver |
  nvidia-legacy-340xx-driver |
  nvidia-legacy-304xx-driver |
  nvidia-kernel-dkms |
+ nvidia-legacy-390xx-kernel-dkms |
  nvidia-legacy-340xx-kernel-dkms |
  nvidia-legacy-304xx-kernel-dkms |
 # proprietary NVIDIA packages in Ubuntu
