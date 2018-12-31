@@ -46,7 +46,7 @@ override_dh_install:
 
 	# Install bash-completion file to non-obsolete directory
 	mkdir -p debian/bumblebee/usr/share/bash-completion/completions/
-	mv debian/bumblebee/etc/bash_completion.d/bumblebee \
+	mv debian/bumblebee/etc/bash_completion.d/* \
 	   debian/bumblebee/usr/share/bash-completion/completions/
 	rm -rf debian/bumblebee/etc/bash_completion.d/
 
