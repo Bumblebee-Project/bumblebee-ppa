@@ -1,0 +1,36 @@
+#!/bin/sh
+set -e
+
+xconffile=/etc/bumblebee/xorg.conf.nvidia
+
+case "$1" in
+  configure)
+      # Repair GL on the intel display
+      for arch in x86_64-linux-gnu i386-linux-gnu; do
+        update-alternatives --force --set \
+          ${arch}_gl_conf /usr/lib/$arch/mesa/ld.so.conf 2>/dev/null || true
+      done
+
+      # assume first device to be discrete in nvidia/nvidia
+      busid=$(lspci -d10de: -nn | grep '\[030[02]\]' | cut -d' ' -f1 | tr . : | head -1)
+
+      if [ -z "$busid" ]; then
+        echo "No Nvidia card found. If you really have an Optimus system,"
+        echo "try selecting the Optimus setup in BIOS and run:"
+        echo "sudo dpkg-reconfigure bumblebee-nvidia"
+      else
+        echo "Selecting $busid as discrete nvidia card. If this is incorrect,"
+        echo "edit the BusID line in $xconffile"
+        sed -i $xconffile -r -e "s/^([\t ]*)#([\t ]*BusID[\t ]*)\"[^\"]*\"$/\\1 \\2\"PCI\:$busid\"/"
+      fi
+
+    ldconfig
+    # this has a chance of crashing the machine with mainline kernels...
+    grep -q '^nouveau ' /proc/modules && rmmod nouveau || true
+    if [ -e "/etc/init/bumblebeed.conf" ]; then
+        invoke-rc.d bumblebeed restart || true
+    fi
+    ;;
+esac
+
+#DEBHELPER#

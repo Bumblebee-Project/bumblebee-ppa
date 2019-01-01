@@ -1,0 +1,96 @@
+bumblebee for Debian/Ubuntu
+---------------------------
+
+Post-installation instructions:
+-------------------------------
+
+You must add your user to the bumblebee group in order to use optirun or
+primusrun, i.e.
+
+ $ sudo adduser $USER bumblebee
+
+where $USER corresponds to your username. Don't forget to log out and log back
+in for this to take effect.
+
+If you have sudo configured for your current user, i.e. your user is a member
+of the sudo group, this step is not needed (the bumblebee package postinst
+script takes care of adding sudo users to the bumblebee group automatically).
+To clarify, sudo is not needed to use bumblebee; it simply makes adding your
+user to the bumblebee group unnecessary.
+
+This step is unnecessary for Ubuntu users since sudo comes pre-configured and
+ready to be used by default (for user accounts created during install).
+
+To test whether bumblebee has been configured correctly, try running the
+glxgears demo (you must first install mesa-utils):
+
+ $ optirun glxgears -info
+
+
+Primus vs. VirtualGL:
+---------------------
+
+Bumblebee in Debian and Ubuntu defaults to using the primus backend, because
+virtualgl has not yet been packaged for Debian/Ubuntu proper. For Ubuntu users,
+it is however easy to switch to using virtualgl by using upstream's PPAs.
+Follow the instructions at:
+https://launchpad.net/~bumblebee/+archive/stable
+
+
+Common issues:
+--------------
+
+- If optirun returns the following error:
+[ERROR]Cannot access secondary GPU - error: Could not load GPU driver
+
+You must edit /etc/bumblebee/bumblebee.conf using your preferred editor as
+root, and change "KernelDriver=nvidia" to "KernelDriver=nvidia-current",
+then restart the bumblebee daemon, i.e.
+
+ $ sudo service bumblebeed restart 
+
+(Refer to https://bugs.debian.org/717687 for a brief explanation.)
+
+- If optirun returns the following error:
+[ERROR]Cannot access secondary GPU - error: [XORG] (EE) No devices detected
+
+You may have to set the BusID manually, in /etc/bumblebee/xorg.conf.nvidia.
+To get the BusID, run lspci | egrep 'VGA|3D' in a terminal. Refer to the
+comments in that file for further instructions.
+
+- If optirun returns the following error:
+[ERROR]Cannot access secondary GPU - error: [XORG] (EE) /dev/dri/card0:
+failed to set DRM interface version 1.4: Permission denied
+
+You have to append the following section to /etc/bumblebee/xorg.conf.nvidia:
+
+Section "Screen"
+    Identifier "Default Screen"
+    Device "DiscreteNvidia"
+EndSection
+
+Also refer to https://bugs.debian.org/756522 for a brief explanation.
+
+- If optirun errors out and dmesg reports that the GPU has "fallen off the bus"
+or "nvidia_frontend_open: minor 0, module->open() failed, error -5" on Linux
+>= 3.10 and < 3.19, either stick with an older kernel version (<= 3.9) or
+upgrade to > 3.19, or add rcutree.rcu_idle_gp_delay=1 to your grub command line
+(in /etc/default/grub, then run update-grub and reboot) as a workaround.
+
+This is a known problem upstream and suspected to be an issue with the
+proprietary nvidia driver. Refer to Bumblebee github issue #455 and #615,
+https://github.com/Bumblebee-Project/Bumblebee/issues/455 and
+https://github.com/Bumblebee-Project/Bumblebee/issues/615.
+
+A more up-to-date list of common issues can be found on the Debian/Ubuntu wiki
+pages relating to bumblebee, i.e.:
+
+https://wiki.debian.org/Bumblebee
+https://wiki.ubuntu.com/Bumblebee
+
+A more comprehensive list is available upstream:
+
+https://github.com/Bumblebee-Project/Bumblebee/wiki/Troubleshooting
+
+
+ -- Vincent Cheng <vcheng@debian.org>  Sat, 25 Oct 2014 10:13:42 -0700

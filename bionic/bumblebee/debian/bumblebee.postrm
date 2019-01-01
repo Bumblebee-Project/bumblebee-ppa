@@ -1,0 +1,25 @@
+#!/bin/sh
+# postrm script for bumblebee
+#
+# see: dh_installdeb(1)
+
+set -e
+
+case "$1" in
+  purge)
+    groupdel bumblebee || true
+    # keep this as old versions did not mark these files as conffiles
+    for file in bumblebee.conf xorg.conf.nvidia xorg.conf.nouveau; do
+        rm -f /etc/bumblebee/$file
+    done
+
+    ;;
+  remove)
+    # Do not treat /etc/modprobe.d/bumblebee-nvidia.conf as a conffile
+    # LP: #1242785, https://github.com/Bumblebee-Project/Bumblebee/issues/525
+    rm -f /etc/modprobe.d/bumblebee.conf
+
+    ;;
+esac
+
+#DEBHELPER#

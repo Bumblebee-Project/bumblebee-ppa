@@ -1,0 +1,44 @@
+# Upstart job for Bumblebee daemon
+
+description "Bumblebee supporting NVIDIA Optimus cards"
+author      "Lekensteyn <lekensteyn@gmail.com>"
+
+# XXX: do we need to stop before / after a graphical DE like kdm?
+start on    (login-session-start or desktop-session-start)
+stop on     (desktop-shutdown)
+
+# restart in case it crashed for some reason
+respawn
+
+script
+	libopts=
+
+	# When the user installs a nvidia package that is unknown,
+	# ignore the paths in bumblebee.conf and use detected ones
+	if ! driver=$(grep -Po '^Driver=\K.*' /etc/bumblebee/bumblebee.conf) \
+		|| [ -z "$driver" ] || [ "$driver" = "nvidia" ]; then
+		# find LibraryPath setting of nvidia section
+		libpath=$(awk -F[=:] '/^\[driver-nvidia\]/{d=1}/^LibraryPath=/{if(d){print $2;exit}}' \
+			/etc/bumblebee/bumblebee.conf) || true
+
+		# pick the first available nvidia installation (not necessary
+		# the latest, e.g. nvidia-current over nvidia-experimental-310)
+		pkgname=$(ls -1d /usr/lib/nvidia*/libGL.so | cut -d/ -f4 | head -1) || true
+
+		# When the default library path does not contain nvidia drivers,
+		# it is possibly not installed. If no driver is installed (no
+		# /usr/lib/nvidia-*), assume that the auto-detection will use
+		# nouveau instead and do not override paths.
+		if [ ! -e "$libpath/libGL.so" -a -n "$pkgname" ] && \
+			modprobe -nq "$pkgname"; then
+			# assume nvidia driver even if nouveau is already loaded
+			libopts="$libopts --driver nvidia"
+			libopts="$libopts --driver-module $pkgname"
+			libopts="$libopts --ldpath /usr/lib/$pkgname:/usr/lib32/$pkgname"
+			libopts="$libopts --module-path /usr/lib/$pkgname/xorg,/usr/lib/xorg/modules"
+		fi
+	fi
+
+	# don't use --daemon as Upstart gets confused by that.
+	exec '/usr/sbin/bumblebeed' --use-syslog $libopts
+end script

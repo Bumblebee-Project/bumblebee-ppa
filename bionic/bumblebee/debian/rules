@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+VENDOR	:= $(shell dpkg-vendor --derives-from Ubuntu && echo Ubuntu || echo Debian)
+
+bbnv_depends_Debian	 = glx-alternative-nvidia (>= 0.6.92)
+bbnv_depends_Ubuntu	 =
+
+MAINTSCRIPTS_GENERATED	 = debian/bumblebee-nvidia.postinst
+MAINTSCRIPTS_GENERATED	+= debian/bumblebee-nvidia.postrm
+
+%:
+	dh $@ --with systemd,autoreconf
+
+configure-for-Ubuntu:
+	dh_auto_configure -- \
+		CONF_DRIVER_MODULE_NVIDIA=nvidia \
+		CONF_LDPATH_NVIDIA=/usr/lib/nvidia-current:/usr/lib32/nvidia-current \
+		CONF_MODPATH_NVIDIA=/usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules \
+		CONF_PRIMUS_LD_PATH=/usr/lib/x86_64-linux-gnu/primus:/usr/lib/i386-linux-gnu/primus \
+		CONF_XORG_BINARY=/usr/lib/xorg/Xorg
+
+configure-for-Debian:
+	dh_auto_configure -- \
+		CONF_DRIVER_MODULE_NVIDIA=nvidia \
+		CONF_LDPATH_NVIDIA=/usr/lib/x86_64-linux-gnu/nvidia:/usr/lib/i386-linux-gnu/nvidia:/usr/lib/nvidia \
+		CONF_MODPATH_NVIDIA=/usr/lib/nvidia/nvidia,/usr/lib/xorg/modules \
+		CONF_PRIMUS_LD_PATH=/usr/lib/x86_64-linux-gnu/primus:/usr/lib/i386-linux-gnu/primus:/usr/lib/primus:/usr/lib32/primus \
+		CONF_XORG_BINARY=/usr/lib/xorg/Xorg
+
+override_dh_auto_configure: $(MAINTSCRIPTS_GENERATED)
+override_dh_auto_configure: configure-for-$(VENDOR)
+
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/bumblebee/
+
+override_dh_clean:
+	dh_clean
+	$(RM) $(MAINTSCRIPTS_GENERATED)
+
+override_dh_install:
+	dh_install
+
+	# Install bash-completion file to non-obsolete directory
+	mkdir -p debian/bumblebee/usr/share/bash-completion/completions/
+	mv debian/bumblebee/etc/bash_completion.d/* \
+	   debian/bumblebee/usr/share/bash-completion/completions/
+	rm -rf debian/bumblebee/etc/bash_completion.d/
+
+override_dh_installinit:
+	dh_installinit --name=bumblebeed
+
+override_dh_strip:
+	dh_strip --dbgsym-migration='bumblebee-dbg (<< 3.2.1-94~)'
+
+override_dh_gencontrol:
+	dh_gencontrol -- -V'nvidia:Depends=$(bbnv_depends_$(VENDOR))'
+
+debian/%: debian/%.$(VENDOR)
+	cp -a $< $@

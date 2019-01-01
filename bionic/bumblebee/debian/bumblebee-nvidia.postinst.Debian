@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  configure)
+      # Repair GL on the intel display
+      update-alternatives --force --set \
+        glx /usr/lib/nvidia/bumblebee || true
+      dpkg-trigger register-glx-alternative-nvidia
+
+    # this has a chance of crashing the machine with mainline kernels...
+    grep -q '^nouveau ' /proc/modules && rmmod nouveau || true
+    if [ -e "/etc/init/bumblebeed.conf" ]; then
+        invoke-rc.d bumblebeed restart || true
+    fi
+    ;;
+esac
+
+#DEBHELPER#

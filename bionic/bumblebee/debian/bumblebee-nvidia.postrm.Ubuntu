@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  remove|abort-install)
+      # Restore the alternatives in case bumblebee is installed on a
+      # non-Optimus system that requires the nvidia driver
+      for arch in x86_64-linux-gnu i386-linux-gnu; do
+        update-alternatives --force --auto ${arch}_gl_conf 2>/dev/null || true
+      done
+
+    ldconfig
+    ;;
+esac
+
+#DEBHELPER#

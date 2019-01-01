@@ -1,0 +1,2 @@
+rm_conffile /etc/modprobe.d/bumblebee.conf 3.2.1-91~
+rm_conffile /etc/bash_completion.d/bumblebee 3.2.1-91~

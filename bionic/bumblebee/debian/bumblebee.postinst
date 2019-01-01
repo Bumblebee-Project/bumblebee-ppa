@@ -1,0 +1,63 @@
+#!/bin/sh
+# postinst script for bumblebee
+#
+# see: dh_installdeb(1)
+
+set -e
+
+xconffile=/etc/bumblebee/xorg.conf.nouveau
+
+# group that allows users to use Bumblebee
+BB_GROUP=bumblebee
+
+# add members of these groups automatically to group "bumblebee" for new
+# installations
+USE_GROUPS='adm sudo admin'
+
+case "$1" in
+  configure)
+    # only add a group and members if the configured group does match the
+    # default group and if the group is missing
+    if grep -qx ServerGroup=$BB_GROUP /etc/bumblebee/bumblebee.conf &&
+        ! getent group $BB_GROUP > /dev/null; then
+        groupadd --system $BB_GROUP
+        users=$(getent group $USE_GROUPS | cut -d: -f4 | tr , '\n' | sort -u)
+        echo "Adding members from group(s) '$USE_GROUPS' to '$BB_GROUP':"
+        echo $users
+        for user in $users; do
+            gpasswd -a $user $BB_GROUP
+        done
+    fi
+
+
+    # Raring specific issue
+    # Also, do not rely solely on dpkg-vendor (see LP: #1061769)
+    if (which dpkg-vendor >/dev/null && dpkg-vendor --derives-from Ubuntu) || \
+      [ -e /etc/dpkg/origins/ubuntu ]; then
+        # assume first device to be discrete in nvidia/nvidia
+        busid=$(lspci -d10de: -nn | grep '\[030[02]\]' | cut -d' ' -f1 | tr . : | head -1)
+        if [ -z "$busid" ]; then
+            echo "No Nvidia card found. If you really have an Optimus system,"
+            echo "try selecting the Optimus setup in BIOS and run:"
+            echo "sudo dpkg-reconfigure bumblebee"
+        else
+            echo "Selecting $busid as discrete nvidia card. If this is incorrect,"
+            echo "edit the BusID line in $xconffile ."
+            sed -i $xconffile -r -e "s/^([\t ]*)#([\t ]*BusID[\t ]*)\"[^\"]*\"$/\\1 \\2\"PCI\:$busid\"/"
+        fi
+        
+        # Only for 3.2.1, remove busid.conf if still present.
+        if [ -e /etc/bumblebee/xorg.conf.d/busid.conf ]; then
+            echo "Deleting old /etc/bumblebee/xorg.conf.d/busid.conf"
+            rm /etc/bumblebee/xorg.conf.d/busid.conf
+        fi
+    fi
+
+    # Do not treat /etc/modprobe.d/bumblebee-nvidia.conf as a conffile
+    # LP: #1242785, https://github.com/Bumblebee-Project/Bumblebee/issues/525
+    cp -f /usr/share/bumblebee/modprobe.d/bumblebee.conf /etc/modprobe.d/bumblebee.conf
+
+    ;;
+esac
+
+#DEBHELPER#

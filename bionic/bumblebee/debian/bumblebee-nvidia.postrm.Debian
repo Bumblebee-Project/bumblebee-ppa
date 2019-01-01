@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  remove|abort-install)
+      # Restore the alternatives in case bumblebee is installed on a
+      # non-Optimus system that requires the nvidia driver
+      update-alternatives --force --auto glx 2>/dev/null || true
+      dpkg-trigger register-glx-alternative-nvidia
+    ;;
+esac
+
+#DEBHELPER#

@@ -1,0 +1,3 @@
+debian/bumblebee.conf                 usr/share/bumblebee/modprobe.d/
+debian/bumblebee/etc/bumblebee/*      usr/share/bumblebee/default-conf/
+scripts/systemd/bumblebeed.service    lib/systemd/system/
