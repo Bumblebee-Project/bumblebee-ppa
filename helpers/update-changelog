@@ -8,7 +8,7 @@ if [ -z "$DEBFULLNAME" -o -z "$DEBEMAIL" ]; then
     echo "Please set those before running this program"
     exit 1
 fi
-DISTS=(trusty xenial)
+DISTS=(trusty xenial bionic)
 IFS='|'
 distreplaces="UNRELEASED|${DISTS[*]}"
 IFS=$' \t\n'
