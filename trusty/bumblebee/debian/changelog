@@ -1,3 +1,10 @@
+bumblebee (3.2.1+git20181231-102~trustyppa1) trusty; urgency=low
+
+  * Add support for 390xx series on Debian.
+  * Drop patches and build from head of develop branch.
+
+ -- Luca Boccassi <bluca@debian.org>  Tue, 01 Jan 2019 13:39:24 +0100
+
 bumblebee (3.2.1-101~trustyppa1) trusty; urgency=low
 
   * Add support for 370, 390 and 396 series.
