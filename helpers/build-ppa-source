@@ -4,7 +4,7 @@
 # Author : Lekensteyn <lekensteyn@gmail.com>
 # License: GPLv3+
 
-DISTS=(precise trusty vivid wily xenial)
+DISTS=(trusty xenial)
 
 cd "$(dirname "$(dirname "$(readlink -f "$0")")")"
 distsdir="$PWD"
