@@ -1,3 +1,9 @@
+bumblebee (3.2.1+git20181231-103~bionicppa1) bionic; urgency=low
+  
+  * Blacklist kernel modules, that are used when installing from nVidia website.
+
+ -- Georgy Berdyshev <georgyberdyshev@users.noreply.github.com>  Fri, 01 Feb 2019 09:21:54 +0200
+
 bumblebee (3.2.1+git20181231-102~bionicppa1) bionic; urgency=low
 
   * Add support for 390xx series on Debian.
