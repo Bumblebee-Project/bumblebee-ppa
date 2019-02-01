@@ -28,7 +28,7 @@ Pre-Depends:
  dpkg (>= 1.15.7.2),
 Depends:
  bbswitch-dkms | bbswitch-source,
- xserver-xorg-core (>= 2:1.18) | xserver-xorg-core-hwe-16.04 (>= 2:1.18),
+ xserver-xorg-core (>= 2:1.18) | xserver-xorg-core-hwe-18.04 (>= 2:1.20),
  ${misc:Depends},
  ${shlibs:Depends},
 Recommends:
