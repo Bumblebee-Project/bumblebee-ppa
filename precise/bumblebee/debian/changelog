@@ -1,3 +1,9 @@
+bumblebee (3.2.1-102~preciseppa1) precise; urgency=low
+  
+  * Blacklist kernel modules, that are used when installing from nVidia website.
+
+ -- Georgy Berdyshev <georgyberdyshev@users.noreply.github.com>  Fri, 01 Feb 2019 09:21:54 +0200
+
 bumblebee (3.2.1-101~preciseppa1) precise; urgency=low
 
   * Add support for 370, 390 and 396 series.
