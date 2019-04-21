@@ -1,8 +1,9 @@
 bumblebee (3.2.1+git20181231-103~trustyppa1) trusty; urgency=low
-  
+
+  [ Georgy Berdyshev ]
   * Blacklist kernel modules, that are used when installing from nVidia website.
 
- -- Georgy Berdyshev <georgyberdyshev@users.noreply.github.com>  Fri, 01 Feb 2019 09:21:54 +0200
+ -- Luca Boccassi <bluca@debian.org>  Sun, 21 Apr 2019 14:55:24 +0100
 
 bumblebee (3.2.1+git20181231-102~trustyppa1) trusty; urgency=low
 
