@@ -1,3 +1,9 @@
+primus (20150328-7~bionicppa1) bionic; urgency=low
+
+  * Add alternative dependency to xserver-xorg-core-hwe-18.04
+
+ -- Luca Boccassi <bluca@debian.org>  Thu, 04 Jul 2019 11:03:56 +0100
+
 primus (20150328-3~xenialppa2) xenial; urgency=medium
 
   * Add alternative dependency to xserver-xorg-core-hwe-16.04
