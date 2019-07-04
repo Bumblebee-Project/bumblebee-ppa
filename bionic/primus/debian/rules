@@ -1,0 +1,49 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+ifeq ($(shell dpkg-vendor --derives-from Ubuntu && echo yes),yes)
+	PRIMUS_libGLa=/usr/lib/$(DEB_HOST_MULTIARCH)/mesa/libGL.so.1
+	PRIMUS_libGLd=/usr/lib/$(DEB_HOST_MULTIARCH)/mesa/libGL.so.1
+	# =1 on 13.04/raring and earlier, 0 (default) on 13.10/saucy and later
+	PRIMUS_UPLOAD=0
+else
+	PRIMUS_libGLa=/usr/lib/$(DEB_HOST_MULTIARCH)/libGL.so.1
+	PRIMUS_libGLd=/usr/lib/$(DEB_HOST_MULTIARCH)/libGL.so.1
+	# =1 on 8/jessie and earlier, 0 (default) on 9/stretch and later
+	PRIMUS_UPLOAD=0
+endif
+
+# Where to put the resulting library during build
+BUILD_LIBDIR ?= lib
+
+%:
+	dh $@ 
+
+override_dh_clean:
+	rm -rf $(BUILD_LIBDIR)
+	dh_clean
+
+override_dh_auto_build:
+	dh_auto_build -- LIBDIR=$(BUILD_LIBDIR) \
+	    PRIMUS_libGLd=$(PRIMUS_libGLd) \
+	    PRIMUS_libGLa=$(PRIMUS_libGLa) \
+	    PRIMUS_UPLOAD=$(PRIMUS_UPLOAD)
+
+override_dh_install:
+	# Make all the paths explicitly
+	mkdir -p debian/primus/usr/bin/ debian/primus-libs/usr/lib/$(DEB_HOST_MULTIARCH)/primus/
+	install -m 755 debian/scripts/primusrun debian/primus/usr/bin/
+	cp -r $(BUILD_LIBDIR)/* debian/primus-libs/usr/lib/$(DEB_HOST_MULTIARCH)/primus/
+	# Install bash-completion file
+	mkdir -p debian/primus/usr/share/bash-completion/completions/
+	mv primus.bash-completion debian/primus/usr/share/bash-completion/completions/primus
+	
+	dh_install
+
+override_dh_strip:
+	dh_strip --dbgsym-migration='primus-libs-dbg (<< 20150328-2~xenialppa1)'

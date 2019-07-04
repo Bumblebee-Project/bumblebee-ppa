@@ -1,0 +1,47 @@
+Source: primus
+Section: utils
+Priority: extra
+Maintainer: The Bumblebee Project <bumblebee@lists.launchpad.net>
+Uploaders: Bruno Pagani <bruno.n.pagani@gmail.com>,
+ Dmitry Zhurikhin <zhurikhin@gmail.com>,
+ Luca Boccassi <luca.boccassi@gmail.com>,
+Build-Depends: debhelper (>= 9), mesa-common-dev
+Standards-Version: 3.9.7
+Homepage: https://github.com/amonakov/primus
+Vcs-Browser: https://github.com/amonakov/primus
+Vcs-Git: git://github.com/amonakov/primus.git
+
+Package: primus
+Architecture: i386 amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, bumblebee, socat,
+ primus-libs (= ${binary:Version}),
+ xserver-xorg-core (>= 2:1.18.3) | xserver-xorg-core-hwe-16.04 (>= 2:1.18) | xserver-xorg-video-intel (>= 2:2.99.917),
+Recommends: primus-libs-ia32 [amd64]
+Description: client-side GPU offloading for NVIDIA Optimus
+ Primus is a shared library that provides OpenGL and GLX APIs and implements
+ low-overhead local-only client-side OpenGL offloading via GLX forking,
+ similar to VirtualGL. It intercepts GLX calls and redirects GL rendering to a
+ secondary X display, presumably driven by a faster GPU. On swapping buffers,
+ rendered contents are read back using a PBO and copied onto the drawable it was
+ supposed to be rendered on in the first place.
+ .
+ Basically primus gives better performance than virtualgl as bumblebee back-end.
+ .
+ Primus is currently intended to be used alongside Bumblebee and provides a
+ drop-in replacement for optirun (i.e. "primusrun").
+
+Package: primus-libs
+Architecture: i386 amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, libgl1-mesa-glx
+Multi-Arch: same
+Description: Shared libraries for primus
+ This package contains the libraries for primus which are loaded when running
+ primusrun.
+
+Package: primus-libs-ia32
+Architecture: i386
+Depends: primus-libs, ${misc:Depends}
+Multi-Arch: foreign
+Description: Shared libraries for primus (32-bit)
+ This package depends on 32-bit libraries for primus. It can safely be
+ removed after installation.
